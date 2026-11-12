@@ -26,6 +26,8 @@ Em `src/jogo.js`, exporte `iniciarPartida`, `jogar`, `comprar` e `passar` como f
 - **D06** joga uma partida inteira com uma sequência fixa até o jogador `0` bater.
 - **D07** encerra uma partida travada por dois passes e verifica vitórias de ambos os jogadores e empate.
 - **D08** confirma que jogar após um passe zera a contagem de passes consecutivos.
+- **D09** confirma a orientação da primeira peça nas duas pontas da mesa vazia.
+- **D10** rejeita ponta desconhecida e ações após o encerramento.
 
 ## Execução
 

@@ -125,3 +125,23 @@ test('D08 uma jogada depois de um passe reinicia a contagem de passes', () => {
     expect(seguinte.vez).toBe(0);
     expect(seguinte.status).toBe('em_andamento');
 });
+
+test('D09 na mesa vazia preserva a orientação fornecida nas duas pontas', () => {
+    for (const ponta of ['esquerda', 'direita']) {
+        const inicial = { ...estadoIntermediario([[[5, 2], [0, 0]], [[6, 6]]]), mesa: [] };
+        const seguinte = jogar(inicial, 0, [5, 2], ponta);
+        expect(seguinte.mesa).toEqual([[5, 2]]);
+        expect(seguinte.maos[0]).toEqual([[0, 0]]);
+        expect(seguinte.vez).toBe(1);
+    }
+});
+
+test('D10 rejeita ponta desconhecida e qualquer ação após o encerramento', () => {
+    const inicial = estadoIntermediario([[[1, 4]], [[6, 6]]]);
+    expect(() => jogar(inicial, 0, [1, 4], 'centro')).toThrow(RangeError);
+
+    const encerrada = { ...inicial, status: 'encerrada', vez: null, vencedor: 1 };
+    expect(() => jogar(encerrada, 0, [1, 4], 'esquerda')).toThrow(RangeError);
+    expect(() => comprar({ ...encerrada, monte: [[0, 0]] }, 0)).toThrow(RangeError);
+    expect(() => passar(encerrada, 0)).toThrow(RangeError);
+});
