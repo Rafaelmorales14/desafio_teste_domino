@@ -29,7 +29,7 @@ Em `src/jogo.js`, exporte `iniciarPartida`, `jogar`, `comprar` e `passar` como f
 
 ## Execução
 
-Com Node.js 24, rode `npm test` na raiz. A entrega registra a etapa **Red** do TDD. Sem `src/jogo.js`, a suíte retorna código 1 com `ERR_MODULE_NOT_FOUND`. Crie esse módulo com o contrato acima e repita `npm test` para executar as asserções.
+Com Node.js 24, rode `npm install` e `npm test` na raiz para executar os testes com Jest. Esta entrega mantém a etapa **Red** do TDD: sem `src/jogo.js`, a suíte falha por falta do módulo. Crie esse módulo com o contrato acima e repita `npm test` para executar as asserções.
 
 ## Colaborador
 

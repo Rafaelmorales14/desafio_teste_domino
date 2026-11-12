@@ -1,5 +1,4 @@
-import { test } from 'node:test';
-import assert from 'node:assert/strict';
+import { test, expect } from '@jest/globals';
 import { iniciarPartida, jogar, comprar, passar } from '../src/jogo.js';
 
 const conjunto = Array.from({ length: 7 }, (_, a) =>
@@ -28,7 +27,7 @@ const estadoIntermediario = (maos, monte = []) => ({
 });
 
 test('D01 distribui sete peças por jogador e deixa 14 no monte', () => {
-    assert.deepEqual(novaPartida(), {
+    expect(novaPartida()).toEqual({
         maos: [maoZero, maoUm],
         monte: monteInicial,
         mesa: [],
@@ -42,50 +41,50 @@ test('D01 distribui sete peças por jogador e deixa 14 no monte', () => {
 test('D02 encaixa e inverte peças nas duas pontas', () => {
     const inicial = estadoIntermediario([[[1, 4], [0, 0]], [[3, 5], [6, 6]]]);
     const esquerda = jogar(inicial, 0, [1, 4], 'esquerda');
-    assert.deepEqual(esquerda.mesa, [[4, 1], [1, 2], [2, 3]]);
-    assert.deepEqual(esquerda.maos[0], [[0, 0]]);
-    assert.equal(esquerda.vez, 1);
+    expect(esquerda.mesa).toEqual([[4, 1], [1, 2], [2, 3]]);
+    expect(esquerda.maos[0]).toEqual([[0, 0]]);
+    expect(esquerda.vez).toBe(1);
 
     const direita = jogar(esquerda, 1, [5, 3], 'direita');
-    assert.deepEqual(direita.mesa, [[4, 1], [1, 2], [2, 3], [3, 5]]);
-    assert.deepEqual(direita.maos[1], [[6, 6]]);
-    assert.equal(direita.vez, 0);
+    expect(direita.mesa).toEqual([[4, 1], [1, 2], [2, 3], [3, 5]]);
+    expect(direita.maos[1]).toEqual([[6, 6]]);
+    expect(direita.vez).toBe(0);
 });
 
 test('D03 rejeita peça incompatível, peça de outra mão e jogada fora da vez', () => {
     const inicial = estadoIntermediario([[[1, 4], [0, 0]], [[3, 5]]]);
 
-    assert.throws(() => jogar(inicial, 0, [0, 0], 'direita'), RangeError);
-    assert.throws(() => jogar(inicial, 0, [1, 4], 'direita'), RangeError);
-    assert.throws(() => jogar(inicial, 0, [3, 5], 'direita'), RangeError);
-    assert.throws(() => jogar(inicial, 1, [3, 5], 'direita'), RangeError);
+    expect(() => jogar(inicial, 0, [0, 0], 'direita')).toThrow(RangeError);
+    expect(() => jogar(inicial, 0, [1, 4], 'direita')).toThrow(RangeError);
+    expect(() => jogar(inicial, 0, [3, 5], 'direita')).toThrow(RangeError);
+    expect(() => jogar(inicial, 1, [3, 5], 'direita')).toThrow(RangeError);
 });
 
 test('D04 compra do topo até encontrar encaixe e mantém a vez entre compras', () => {
     const inicial = estadoIntermediario([[[0, 0]], [[6, 6]]], [[4, 4], [1, 5], [2, 6]]);
     const primeira = comprar(inicial, 0);
-    assert.deepEqual(primeira.maos[0], [[0, 0], [4, 4]]);
-    assert.deepEqual(primeira.monte, [[1, 5], [2, 6]]);
-    assert.equal(primeira.vez, 0);
-    assert.throws(() => passar(primeira, 0), RangeError);
+    expect(primeira.maos[0]).toEqual([[0, 0], [4, 4]]);
+    expect(primeira.monte).toEqual([[1, 5], [2, 6]]);
+    expect(primeira.vez).toBe(0);
+    expect(() => passar(primeira, 0)).toThrow(RangeError);
 
     const segunda = comprar(primeira, 0);
-    assert.deepEqual(segunda.maos[0], [[0, 0], [4, 4], [1, 5]]);
-    assert.deepEqual(segunda.monte, [[2, 6]]);
-    assert.equal(segunda.vez, 0);
-    assert.throws(() => comprar(segunda, 0), RangeError);
-    assert.equal(jogar(segunda, 0, [1, 5], 'esquerda').vez, 1);
+    expect(segunda.maos[0]).toEqual([[0, 0], [4, 4], [1, 5]]);
+    expect(segunda.monte).toEqual([[2, 6]]);
+    expect(segunda.vez).toBe(0);
+    expect(() => comprar(segunda, 0)).toThrow(RangeError);
+    expect(jogar(segunda, 0, [1, 5], 'esquerda').vez).toBe(1);
 });
 
 test('D05 permite passe somente com monte vazio e nenhuma jogada', () => {
-    assert.throws(() => passar(estadoIntermediario([[[1, 4]], [[4, 4]]]), 0), RangeError);
+    expect(() => passar(estadoIntermediario([[[1, 4]], [[4, 4]]]), 0)).toThrow(RangeError);
 
     const inicial = estadoIntermediario([[[0, 0]], [[4, 4]]]);
-    assert.throws(() => comprar(inicial, 0), RangeError);
+    expect(() => comprar(inicial, 0)).toThrow(RangeError);
     const seguinte = passar(inicial, 0);
-    assert.equal(seguinte.status, 'em_andamento');
-    assert.equal(seguinte.vez, 1);
-    assert.equal(seguinte.passes, 1);
+    expect(seguinte.status).toBe('em_andamento');
+    expect(seguinte.vez).toBe(1);
+    expect(seguinte.passes).toBe(1);
 });
 
 test('D06 encerra uma partida completa ao jogar a última peça', () => {
@@ -93,15 +92,15 @@ test('D06 encerra uma partida completa ao jogar a última peça', () => {
     for (const [i, peca] of sequencia.entries()) {
         estado = jogar(estado, i % 2, peca, 'direita');
         if (i < sequencia.length - 1) {
-            assert.equal(estado.status, 'em_andamento');
-            assert.equal(estado.vez, (i + 1) % 2);
+            expect(estado.status).toBe('em_andamento');
+            expect(estado.vez).toBe((i + 1) % 2);
         }
     }
-    assert.equal(estado.mesa.length, 13);
-    assert.deepEqual(estado.maos, [[], [[0, 0]]]);
-    assert.equal(estado.status, 'encerrada');
-    assert.equal(estado.vencedor, 0);
-    assert.equal(estado.vez, null);
+    expect(estado.mesa.length).toBe(13);
+    expect(estado.maos).toEqual([[], [[0, 0]]]);
+    expect(estado.status).toBe('encerrada');
+    expect(estado.vencedor).toBe(0);
+    expect(estado.vez).toBe(null);
 });
 
 test('D07 partida travada é vencida pela menor soma, com empate em somas iguais', () => {
@@ -113,16 +112,16 @@ test('D07 partida travada é vencida pela menor soma, com empate em somas iguais
 
     for (const { maos, vencedor } of cenarios) {
         const final = passar(passar(estadoIntermediario(maos), 0), 1);
-        assert.equal(final.status, 'encerrada');
-        assert.equal(final.vencedor, vencedor);
-        assert.equal(final.vez, null);
+        expect(final.status).toBe('encerrada');
+        expect(final.vencedor).toBe(vencedor);
+        expect(final.vez).toBe(null);
     }
 });
 
 test('D08 uma jogada depois de um passe reinicia a contagem de passes', () => {
     const inicial = estadoIntermediario([[[0, 0]], [[3, 5], [6, 6]]]);
     const seguinte = jogar(passar(inicial, 0), 1, [3, 5], 'direita');
-    assert.equal(seguinte.passes, 0);
-    assert.equal(seguinte.vez, 0);
-    assert.equal(seguinte.status, 'em_andamento');
+    expect(seguinte.passes).toBe(0);
+    expect(seguinte.vez).toBe(0);
+    expect(seguinte.status).toBe('em_andamento');
 });
